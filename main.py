@@ -401,6 +401,3 @@ while run:
 
     pg.display.update()
     fps.tick(60)
-
-# todo fly fall after collision
-# todo fly rotates 90 degrees while falling
