@@ -61,7 +61,9 @@ class Bird(pg.sprite.Sprite):
         collision with pipe
         """
         global game_active, start_game
-        if pg.sprite.spritecollide(self, pipe_group, False) or pg.sprite.spritecollide(self, fly_group, False):
+        if pg.sprite.spritecollide(self, pipe_group, False) or pg.sprite.spritecollide(
+            self, fly_group, False
+        ):
             game_active = False
             # fly.fly_fall()
 
@@ -81,9 +83,9 @@ class Bird(pg.sprite.Sprite):
         """
         if len(pipe_group) > 0:
             if (
-                    self.rect.left > pipe_group.sprites()[0].rect.left
-                    and self.rect.right < pipe_group.sprites()[0].rect.right
-                    and not self.pass_pipe
+                self.rect.left > pipe_group.sprites()[0].rect.left
+                and self.rect.right < pipe_group.sprites()[0].rect.right
+                and not self.pass_pipe
             ):
                 self.pass_pipe = True
             # if bird has passed a pipe
@@ -104,7 +106,9 @@ class Bird(pg.sprite.Sprite):
         if game_active:
             self.obstacle_collision()
             self.bird_animation()
-            self.image = pg.transform.rotate(self.images[int(self.current_image)], self.gravity * -2)
+            self.image = pg.transform.rotate(
+                self.images[int(self.current_image)], self.gravity * -2
+            )
         else:
             self.image = pg.transform.rotate(self.images[int(self.current_image)], -90)
 
@@ -117,7 +121,9 @@ class Pipe(pg.sprite.Sprite):
 
         if pipe_type == "top":
             self.image = pg.transform.flip(self.image, False, True)
-            self.rect = self.image.get_rect(bottomleft=(x_pos, y_pos - self.pipe_gap // 2))
+            self.rect = self.image.get_rect(
+                bottomleft=(x_pos, y_pos - self.pipe_gap // 2)
+            )
         else:
             self.rect = self.image.get_rect(topleft=(x_pos, y_pos - self.pipe_gap // 2))
 
@@ -162,7 +168,7 @@ class Fly(pg.sprite.Sprite):
         """
         animating the flight process of the fly
         """
-        self.current_image += 1
+        self.current_image += 0.5
         if self.current_image >= len(self.images):
             self.current_image = 0
         self.image = self.images[int(self.current_image)]
@@ -180,7 +186,7 @@ class Fly(pg.sprite.Sprite):
         gravity for when the fly is hit
         """
         self.rect.bottom += self.gravity
-        if self.rect.bottom >= screen_height - 110:
+        if self.rect.bottom >= screen_height - 110 and game_active:
             self.rect.left -= 4
 
     def fly_deletion(self):
@@ -198,6 +204,8 @@ class Fly(pg.sprite.Sprite):
         # making sure the fly does not fall off-screen
         if self.rect.bottom >= screen_height - 110:
             self.rect.bottom = screen_height - 100
+        if game_active:
+            self.rect.left -= 4
 
     def collision_with_bird(self):
         """
@@ -253,6 +261,12 @@ class Button:
 
     def draw_button(self):
         if not game_active:
+            font = pg.font.SysFont("Arial", 40)
+            font_text = font.render("Press Space to", True, "white")
+            font_text_rect = font_text.get_rect(
+                center=(self.rect.centerx, self.rect.top - 50)
+            )
+            screen.blit(font_text, font_text_rect)
             screen.blit(self.image, self.rect)
 
 
@@ -270,8 +284,8 @@ def scroll_ground():
     :return: the current scroll of the ground
     """
     global ground_scroll
-    scroll_speed = 4
     if game_active:
+        scroll_speed = 4
         ground_scroll -= scroll_speed
 
     if abs(ground_scroll) > 35:
@@ -355,7 +369,11 @@ while run:
         if event.type == pipe_timer and start_game:
             pipe_height = randint(-100, 100)
             top_pipe = Pipe(screen_width, screen_height // 2 + pipe_height, "top")
-            bottom_pipe = Pipe(screen_width, screen_height - (screen_height - 250) // 2 + pipe_height, "bottom")
+            bottom_pipe = Pipe(
+                screen_width,
+                screen_height - (screen_height - 250) // 2 + pipe_height,
+                "bottom",
+            )
             # adding pipes to group
             pipe_group.add(top_pipe)
             pipe_group.add(bottom_pipe)
